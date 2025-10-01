@@ -4,8 +4,25 @@ services:
     build: .
     ports:
       - "3000:3000"
+      - "5555:5555"  # Prisma Studio用ポートを追加
     volumes:
       - .:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true # ホットリロード
+    depends_on:
+      - db
+  
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=nextjs-prisma-graphql-codegen-dev
+    restart: unless-stopped
+
+volumes:
+  mysql:
