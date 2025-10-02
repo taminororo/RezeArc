@@ -47,7 +47,6 @@ next-env.d.ts
 !prisma/migrations/.gitkeep
 
 # OS generated files
-.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
@@ -86,3 +85,9 @@ lerna-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Additional
+.eslintcache
+.history/
+*.tgz
+.envrc
