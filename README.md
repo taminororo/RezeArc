@@ -36,11 +36,23 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 # コピペして使って
-# 1. Prismaクライアントを生成
+# 1. Docker起動
+docker-compose up
+
+# 2. Prismaクライアントを生成
 docker-compose exec next-app npx prisma generate
 
-# 2. データベースマイグレーションを実行
+# 3. データベースマイグレーションを実行
 docker-compose exec next-app npx prisma migrate dev --name init
 
-# 3. データベース接続確認（オプション）
+# 4. データベース接続確認（オプション）
 docker-compose exec next-app npx prisma studio
+
+## MySQLに入る
+docker compose exec -it db sh
+## ログイン
+mysql -u root -p
+
+## DBを見る
+show databases;
+

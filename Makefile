@@ -11,7 +11,7 @@ logs:
 	docker compose logs
 
 exec:
-	docker compose exec -it next-app bash
+	docker compose exec -it next-app sh
 
 down:
 	docker compose down
