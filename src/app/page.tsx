@@ -1,15 +1,17 @@
 import Image from "next/image";
-
-import TicketTag from "@/components/ticketTag";
-
-import Header from "@/components/header";
-
+import DetailCard from "@/components/detailcard";
 
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <Header />
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+            <main className="p-8">
+      <DetailCard
+        title="企画を見る"
+        description="全ての企画の詳細情報と混雑状況をチェック"
+        onClick={() => { /* クリック時の処理 */ }}
+      />
+    </main>
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -29,7 +31,6 @@ export default function Home() {
           <li className="tracking-[-.01em]">
             Save and see your changes instantly.
           </li>
-          <TicketTag status="ended" />
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
