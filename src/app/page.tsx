@@ -1,17 +1,11 @@
+"use client";
+
 import Image from "next/image";
-import DetailCard from "@/components/detailcard";
 
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-            <main className="p-8">
-      <DetailCard
-        title="企画を見る"
-        description="全ての企画の詳細情報と混雑状況をチェック"
-        onClick={() => { /* クリック時の処理 */ }}
-      />
-    </main>
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -26,7 +20,7 @@ export default function Home() {
             <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
               src/app/page.tsx
             </code>
-            .
+
           </li>
           <li className="tracking-[-.01em]">
             Save and see your changes instantly.
