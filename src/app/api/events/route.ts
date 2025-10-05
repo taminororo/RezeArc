@@ -16,6 +16,8 @@ export async function GET() {
       ticket_status: e.ticketStatus,       // null or distributing|limited|ended
       congestion_status: e.congestionStatus, // free|slightly_crowded|crowded|offtime
       event_text: e.eventText ?? null,
+      image_path: e.imagePath ?? null,
+      created_at: e.createdAt,
       updated_at: e.updatedAt,
     })),
     { status: 200 }

@@ -9,7 +9,7 @@ const EVENTS = [
     ticketStatus: TicketStatus.limited, // TicketTag status
     congestionStatus: CongestionStatus.crowded,
     eventText: null,
-    imagePath: "event_photo1.svg", // /public/event_photo1.svg
+    imagePath: "/event_photo1.svg", // /public/event_photo1.svg
   },
   {
     eventId: 2,
@@ -18,7 +18,7 @@ const EVENTS = [
     ticketStatus: TicketStatus.limited,
     congestionStatus: CongestionStatus.offtime,
     eventText: null,
-    imagePath: "event_photo2.svg",
+    imagePath: "/event_photo2.svg",
   },
   {
     eventId: 3,
@@ -27,7 +27,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.crowded,
     eventText: null,
-    imagePath: "event_photo3.svg",
+    imagePath: "/event_photo3.svg",
   },
   {
     eventId: 4,
@@ -36,7 +36,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.slightly_crowded,
     eventText: null,
-    imagePath: "event_photo4.svg",
+    imagePath: "/event_photo4.svg",
   },
   {
     eventId: 5,
@@ -45,7 +45,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.free,
     eventText: null,
-    imagePath: "event_photo5.svg",
+    imagePath: "/event_photo5.svg",
   },
   {
     eventId: 6,
@@ -54,7 +54,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.free,
     eventText: null,
-    imagePath: "event_photo6.svg",
+    imagePath: "/event_photo6.svg",
   },
   {
     eventId: 7,
@@ -63,7 +63,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.offtime,
     eventText: null,
-    imagePath: "event_photo7.svg",
+    imagePath: "/event_photo7.svg",
   },
   {
     eventId: 8,
@@ -72,7 +72,7 @@ const EVENTS = [
     ticketStatus: null,
     congestionStatus: CongestionStatus.offtime,
     eventText: null,
-    imagePath: "event_photo8.svg",
+    imagePath: "/event_photo8.svg",
   },
 ];
 
