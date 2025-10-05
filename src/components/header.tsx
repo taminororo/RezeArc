@@ -1,9 +1,20 @@
 // src/components/header.tsx
+"use client";
+import Image from "next/image";
+import React from "react";
+
 export default function Header() {
   return (
-    <header className="w-full bg-gray-200 h-12 flex items-center px-4">
-      {/* 左の四角いアイコン（仮にグレーで表示） */}
-      <div className="w-6 h-6 bg-gray-400 rounded-sm" />
+    <header className="w-full bg-[#394366] h-14 flex items-center px-4">
+        <div className="mb-4 md:mb-0 self-start">
+          <Image
+            src="/logo.png"
+            alt="大学ロゴ"
+            width={60}
+            height={60}
+            className="md:ml-0"
+          />
+        </div>
     </header>
   );
 }
