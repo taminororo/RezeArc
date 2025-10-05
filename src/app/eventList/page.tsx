@@ -7,7 +7,6 @@ import Header from "@/components/header";
 import EventCard from "@/components/eventCard";
 import Footer from "@/components/footer";
 import CongestionTag from "@/components/congestionTag";
-import TicketTag from "@/components/ticketTag";
 
 import { useState } from "react";
 import EventSearchButton from "@/components/eventSearchButton";
@@ -20,7 +19,7 @@ export default function TicketDistributionPage() {
     const [results, setResults] = useState<Project[]>([]);
 
     return (
-        <div className="relative min-h-screen w-full h-full flex flex-col items-center">
+        <div className="relative min-h-screen w-full flex flex-col items-center">
             {/* 背景画像 */}
             <div className="absolute inset-0 w-full -z-10">
                 <Image
@@ -40,7 +39,7 @@ export default function TicketDistributionPage() {
             <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
                 {/* タイトル */}
                 <h1 className="text-center text-2xl font-bold mt-4 text-black">
-                    整理券配布企画一覧
+                    企画一覧
                 </h1>
 
                 {/* 検索ボタン */}
@@ -76,16 +75,38 @@ export default function TicketDistributionPage() {
                 <div className="w-full max-w-sm flex flex-col gap-4 mt-6 px-2">
                     {/* ここにEventCardを複数配置 */}
                     <EventCard
-                        imageSrc="/event_photo1.svg"
-                        title="お化け屋敷"
-                        statusTicket={<TicketTag status="limited" />}
+                        imageSrc="/event_photo3.svg"
+                        title="ワークショップ"
                         statusComponent={<CongestionTag status="crowded" />}
                         onClick={() => { /* クリック時の処理 */ }}
                     />
                     <EventCard
-                        imageSrc="/event_photo2.svg"
-                        title="ゲスト企画"
-                        statusTicket={<TicketTag status="limited" />}
+                        imageSrc="/event_photo4.svg"
+                        title="8番出口"
+                        statusComponent={<CongestionTag status="slightly_crowded" />}
+                        onClick={() => { /* クリック時の処理 */ }}
+                    />
+                    <EventCard
+                        imageSrc="/event_photo5.svg"
+                        title="二人羽織"
+                        statusComponent={<CongestionTag status="free" />}
+                        onClick={() => { /* クリック時の処理 */ }}
+                    />
+                    <EventCard
+                        imageSrc="/event_photo6.svg"
+                        title="技大でバッティング"
+                        statusComponent={<CongestionTag status="free" />}
+                        onClick={() => { /* クリック時の処理 */ }}
+                    />
+                    <EventCard
+                        imageSrc="/event_photo7.svg"
+                        title="ビンゴ大会"
+                        statusComponent={<CongestionTag status="offtime" />}
+                        onClick={() => { /* クリック時の処理 */ }}
+                    />
+                    <EventCard
+                        imageSrc="/event_photo8.svg"
+                        title="ゲーム大会"
                         statusComponent={<CongestionTag status="offtime" />}
                         onClick={() => { /* クリック時の処理 */ }}
                     />
