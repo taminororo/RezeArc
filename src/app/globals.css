@@ -38,3 +38,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Zen+Kaku+Gothic+New&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-title: "Yuji+Syuku", sans-serif;
+}
