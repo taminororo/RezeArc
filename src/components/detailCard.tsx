@@ -1,33 +1,43 @@
-"use client";
-
-import React from "react";
-
+// ...existing code...
 export type DetailCardProps = {
-  title?: string;
+  title?: React.ReactNode; // 追加
   description?: string;
   className?: string;
   onClick?: () => void;
 };
 
 export default function DetailCard({
-  title = "企画を見る",
+  title, // 追加
   description = "全ての企画の詳細情報と混雑状況をチェック",
   className = "",
   onClick,
 }: DetailCardProps) {
   return (
     <div
-      className={
-        "w-full max-w-3xl rounded-2xl p-8 sm:p-10 bg-[#e6e2e2] shadow-sm " +
-        className
-      }
+      className={`
+        w-full max-w-2xl 
+        bg-[#fffdfa]
+        rounded-2xl 
+        p-4 
+        ${className}
+        relative
+        border-[2px] border-[#434d6e]
+      `}
+      style={{
+        boxShadow: "4px 4px 0 0 #434d6e", // 右下にだけ影
+        position: "relative",
+      }}
       onClick={onClick}
-      style={{ cursor: onClick ? "pointer" : "default" }}
     >
-      <h3 className="text-2xl sm:text-3xl font-semibold text-[#111827] mb-4">
-        {title}
-      </h3>
-      <p className="text-base sm:text-lg text-[#111827]">
+      {title ? (
+        <h3 className="px-0 text-lg sm:text-lg font-semibold mt-6 mb-4">{title}</h3>
+      ) : (
+        <h3 className="px-2 text-lg sm:text-lg font-semibold mt-6 mb-4">
+          <span className="text-[#d72660]">企画</span>
+          <span className="text-black">を見る</span>
+        </h3>
+      )}
+      <p className="px-2 text-sm sm:text-lg text-black mb-6">
         {description}
       </p>
     </div>
