@@ -36,7 +36,7 @@ export default function TicketDistributionPage() {
             </div>
 
             {/* メインコンテンツ */}
-            <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
+            <main className="flex-1 w-full flex flex-col items-center min-h-[1000px]">
                 {/* タイトル */}
                 <h1 className="text-center text-2xl font-bold mt-4 text-black">
                     企画一覧
