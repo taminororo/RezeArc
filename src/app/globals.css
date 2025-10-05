@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -37,4 +39,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@theme {
+  --font-title: "Yuji Syuku", sans-serif;
+  --font-main_text: "Zen Kaku Gothic New", sans-serif;
 }
