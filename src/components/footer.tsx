@@ -5,15 +5,15 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#394366] text-white py-6 px-8">
+    <footer className="bg-[#394366] text-white py-6 px-6">
       <div className="flex flex-col md:flex-row items-center md:items-start justify-between max-w-6xl mx-auto">
         {/* 左側：ロゴ */}
-        <div className="mb-4 md:mb-0 self-start">
+        <div className="mb-4 md:mb-0 self-start ma-auto">
           <Image
-            src="/logo.png"
+            src="/44th_logo.svg"
             alt="大学ロゴ"
-            width={60}
-            height={60}
+            width={50}
+            height={50}
             className="md:ml-0"
           />
         </div>
@@ -26,7 +26,7 @@ const Footer = () => {
               <Image src="/Vector.svg" alt="X" width={26} height={26} />
             </a>
             <a href="#" aria-label="Instagram">
-              <Image src="/instagramIcon.svg" alt="Instagram" width={26} height={26} />
+              <Image src="/Instagram.svg" alt="Instagram" width={26} height={26} />
             </a>
             <a href="#" aria-label="Facebook">
               <Image src="/facebookIcon.svg" alt="Facebook" width={26} height={26} />
