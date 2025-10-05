@@ -15,10 +15,6 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
-    "next": "^15.5.4",
-    "prisma": "^6.16.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
     "clsx": "^2.1.1",
     "next": "15.5.4",
     "prisma": "^6.16.3",
@@ -35,11 +31,10 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "node --loader ts-node/esm prisma/seed.mts"
   }
-
-
 }
