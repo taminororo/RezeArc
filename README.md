@@ -40,13 +40,13 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 docker-compose up
 
 # 2. Prismaクライアントを生成
-docker-compose exec next-app npx prisma generate
+docker compose exec next-app npx prisma generate
 
 # 3. データベースマイグレーションを実行
-docker-compose exec next-app npx prisma migrate dev --name init
+docker compose exec next-app npx prisma migrate dev --name init
 
 # 4. データベース接続確認（オプション）
-docker-compose exec next-app npx prisma studio
+docker compose exec next-app npx prisma studio
 
 ## MySQLに入る
 docker compose exec -it db sh
