@@ -1,6 +1,8 @@
+// ...existing code...
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Accordion() {
   const [open, setOpen] = useState(false);
@@ -25,9 +27,17 @@ export default function Accordion() {
       {/* コンテンツ部分 */}
       {open && (
         <div className="p-4 bg-amber-200">
-          <img src="/vercel.svg" alt="sample" className="w-40 h-auto" />
+          <Image
+            src="/vercel.svg"
+            alt="sample"
+            width={160}   // Tailwind の w-40 に対応
+            height={160}  // 実際のアスペクト比に合わせて調整してください
+            className="object-contain"
+           priority
+          />
         </div>
       )}
     </div>
   );
 }
+// ...existing code...

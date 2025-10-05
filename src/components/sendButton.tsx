@@ -31,6 +31,7 @@ export default function SendButton() {
 
       setMessage("送信に成功しました ✅");
     } catch (err) {
+        console.error(err);
       setMessage("送信に失敗しました ❌");
     } finally {
       setLoading(false);
