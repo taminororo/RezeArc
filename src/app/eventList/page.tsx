@@ -55,7 +55,7 @@ export default function Home() {
       {/* メイン */}
       <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
         <h1 className="text-center text-2xl font-bold mt-4 text-black">
-          整理券を配布していない企画一覧
+          企画一覧
         </h1>
 
         {loading && <p className="mt-4 text-gray-600">読み込み中...</p>}
