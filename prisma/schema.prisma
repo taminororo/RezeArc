@@ -29,6 +29,7 @@ model Event {
   ticketStatus       TicketStatus?                        // 配布時のみ有効（NULL許容）
   congestionStatus   CongestionStatus
   eventText          String?                               // 説明文は任意
+  imagePath     String?  // 例: "events/3.webp"（/public/events/3.webp を指す）
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
 }

@@ -1,18 +1,23 @@
-# docker-compose.yml
 services:
   next-app:
     build: .
+    env_file:
+      - .env
     ports:
       - "3000:3000"
-      - "5555:5555"  # Prisma Studio用ポートを追加
+      - "5555:5555"  # Prisma Studio
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/app        # ← :delegated を外す（必要なら :cached にする）
+      - /app/node_modules  # 匿名ボリュームで node_modules をコンテナ側に固定
     environment:
-      - CHOKIDAR_USEPOLLING=true # ホットリロード
+      - WATCHPACK_POLLING=true         # Webpack/TSC の監視をポーリングに
+      - CHOKIDAR_USEPOLLING=true       # Chokidar をポーリングに
+      - CHOKIDAR_INTERVAL=200          # 監視頻度（ms）
+      - TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling
+      # ↑ TypeScript の再ビルドが発火しない時に効く
     depends_on:
       - db
-  
+
   db:
     image: mysql:8.0
     ports:
