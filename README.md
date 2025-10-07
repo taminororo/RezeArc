@@ -56,3 +56,6 @@ mysql -u root -p
 ## DBを見る
 show databases;
 
+## seedデータの生成
+docker compose exec next-app npm run seed
+
