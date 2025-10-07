@@ -5,16 +5,17 @@ import MapWithPins, { type MapPin } from "@/components/MapWithPins";
 export default function MapPage() {
     // 必ず pins を定義して渡す
     const pins: MapPin[] = [
-        { id: "large_lab", x: 0, y: 0, href: "/facilities/large-lab", label: "大型実験棟" },
-        { id: "energy_system", x: 47, y: 19, href: "/facilities/energy-system", label: "量子力学・システム安全棟" },
-        { id: "mech_lab", x: 42, y: 35, href: "/facilities/mechanical-lab", label: "機械棟試験棟" },
-        { id: "gym", x: 36, y: 55, href: "/facilities/gym", label: "体育館" },
-        { id: "dojo", x: 44, y: 58, href: "/facilities/dojyo", label: "武道館" },
-        { id: "applied_lab", x: 49, y: 66, href: "/facilities/applied-lab", label: "アプライドラボ" },
-        { id: "lecture", x: 68, y: 38, href: "/facilities/lecture", label: "講義棟" },
-        { id: "material_lab", x: 60, y: 32, href: "/facilities/material", label: "物質材料棟" },
-        { id: "optics_center", x: 9, y: 73, href: "/facilities/optics", label: "地殻環境光実験センター" },
-        { id: "bus_stop", x: 94, y: 85, href: "/access/bus", label: "バス停" },
+        { id: "large_experiment", x: 38, y: 21, href: "/facilities/large-experiment", label: "大型実験棟" },
+        { id: "nuclear_system", x: 45.5, y: 35, href: "/facilities/nuclear-system", label: "原子力安全・システム安全棟" },
+        { id: "new_lecture", x: 82.5, y: 38, href: "/facilities/new-lecture", label: "新講義棟" },
+        { id: "lecture", x: 76, y: 43, href: "/facilities/lecture", label: "講義棟" },
+        { id: "material", x: 67.3, y: 49, href: "/facilities/material", label: "物質材料棟" },
+        { id: "mechanical_construction", x: 33.3, y: 49.5, href: "/facilities/mechanical-construction", label: "機械建設棟" },
+        { id: "plaza", x: 46, y: 58, href: "/facilities/plaza", label: "広場" },
+        { id: "gym_and_dojo", x: 38, y: 62, href: "/facilities/gym-and-dojo", label: "体育館・武道館" },
+        { id: "festival", x: 23, y: 63, href: "/facilities/festival", label: "縁日" },
+        { id: "multimedia", x: 61, y: 65.5, href: "/facilities/multimedia", label: "マルチメディア" },
+        { id: "disaster_center", x: 5, y: 73, href: "/facilities/disaster-center", label: "地域防災実験研究センター" },
     ];
 
     return (
