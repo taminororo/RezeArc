@@ -15,7 +15,7 @@ export default function MapPage() {
       <h1 className="text-2xl font-bold text-black mb-4">キャンパスマップ</h1>
 
       <MapWithPins
-        imageSrc="/campus-map.png"
+        imageSrc="/map_all.svg"
         aspectRatio={1028 / 768}
         pins={pins}
         className="max-w-6xl"

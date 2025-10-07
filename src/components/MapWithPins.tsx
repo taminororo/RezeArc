@@ -61,7 +61,7 @@ export default function MapWithPins({
                 />
               </div>
 
-              <div className="absolute inset-0 z-50 pointer-events-none">
+              <div className="absolute inset-0 z-50">
                 {pins.map((p) => (
                   <PinButton key={p.id} pin={p} />
                 ))}
