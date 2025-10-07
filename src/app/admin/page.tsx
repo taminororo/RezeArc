@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState } from "react";
-
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import QuestionTitle from "@/components/questionTitle";
@@ -12,7 +11,6 @@ import TicketRadioButton from "@/components/ticketRadioButton";
 import TextField from "@/components/textField";
 import SendButton from "@/components/sendButton";
 
-// 型は各コンポーネント側に合わせる
 type CongestionStatus = "free" | "slightly_crowded" | "crowded" | "offtime";
 type TicketStatus = "distributing" | "limited" | "ended";
 
@@ -25,12 +23,8 @@ export default function AdminSettingsPage() {
   return (
     <div className="min-h-dvh w-full bg-[#e2e2e2] text-black">
       <Header />
-
-      {/* ページ本体 */}
       <main className="mx-auto w-full max-w-[390px] bg-white">
-        {/* 画面内余白 */}
         <div className="px-6 pt-10 pb-20">
-          {/* タイトル */}
           <h1 className="text-center text-2xl font-bold mb-8">管理者設定</h1>
 
           {/* 企画情報 */}
@@ -53,7 +47,10 @@ export default function AdminSettingsPage() {
           <section className="space-y-3 mb-8">
             <QuestionTitle text="混雑状況" />
             <div className="mt-3">
-              <CongestionRadioButton value={congestionStatus} onChange={setCongestion} />
+              <CongestionRadioButton
+                value={congestionStatus}
+                onChange={setCongestion}
+              />
             </div>
           </section>
 
@@ -65,26 +62,28 @@ export default function AdminSettingsPage() {
             </div>
           </section>
 
-          {/* 企画説明 */}
+          {/* 企画説明（任意） */}
           <section className="space-y-3 mb-10">
             <QuestionTitle text="企画説明" />
             <div className="mt-3">
-              {/* 仕様上 TextField は input ですが、見た目をエリアっぽく高さだけ出します */}
               <div className="rounded-md border border-black p-3">
                 <TextField value={eventText} onChange={setEventText} />
-                {/* 高さを稼ぐための余白（スマホのモックに寄せる） */}
                 <div className="h-24" />
               </div>
             </div>
           </section>
 
-          {/* 送信ボタン */}
+          {/* 送信ボタン（props を渡す） */}
           <div className="flex justify-center">
-            <SendButton />
+            <SendButton
+              eventId={eventId}
+              congestionStatus={congestionStatus}
+              ticketStatus={ticketStatus}
+              eventText={eventText}
+            />
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
