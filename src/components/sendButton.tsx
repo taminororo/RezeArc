@@ -1,54 +1,81 @@
+// src/components/sendButton.tsx
 "use client";
-
-// クリックでAPIにPOSTリクエストを送り、成功・失敗メッセージを表示するボタンコンポーネント
-// loading状態の管理とスタイルの変更も含む
-// APIエンドポイントは仮のものなので、実際には適切なURLに変更してください
-// 例: fetch("/api/send", { method: "POST", ... })
-
 import { useState } from "react";
 
-export default function SendButton() {
+type Props = {
+  eventId: string; // 文字列で来るので数値化してパスに使う
+  congestionStatus: "free" | "slightly_crowded" | "crowded" | "offtime";
+  ticketStatus: "distributing" | "limited" | "ended";
+  eventText: string;
+};
+
+export default function SendButton({
+  eventId,
+  congestionStatus,
+  ticketStatus,
+  eventText,
+}: Props) {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const handleClick = async () => {
+  const onClick = async () => {
     setLoading(true);
-    setMessage("");
-
+    setMsg(null);
     try {
-      // 仮のPOSTリクエスト（API未実装なので失敗するかモック用）
-      const res = await fetch("/api/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ example: "data" }),
-      });
-
-      if (!res.ok) {
-        throw new Error("API Error");
+      // ① 企画IDの正規化
+      const idNum = Number(String(eventId).trim());
+      if (!Number.isInteger(idNum) || idNum < 0) {
+        throw new Error("企画IDが不正です（半角の非負整数）");
       }
 
-      setMessage("送信に成功しました ✅");
-    } catch (err) {
-        console.error(err);
-      setMessage("送信に失敗しました ❌");
+      // ② 値の正規化（trim + 小文字化。必要ならここにマッピングを追加）
+      const normCong = String(congestionStatus).trim().toLowerCase();
+      const normTicket = ticketStatus ? String(ticketStatus).trim().toLowerCase() : undefined;
+
+      // ③ ボディは API 仕様に合わせて「スネークケース」で作る
+      //    event_text は空なら送らない（nullは送らない！）
+      const body: Record<string, unknown> = {
+        congestion_status: normCong, // ← 必須
+        // ticket_status は不要なら省略してOK（isDistributingTicket=falseだとサーバでnullに矯正）
+        ...(normTicket ? { ticket_status: normTicket } : {}),
+        ...(eventText.trim() ? { event_text: eventText } : {}), // 空文字は送らない
+      };
+
+      const res = await fetch(`/api/events/${idNum}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // サーバの詳細メッセージを画面に出してデバッグしやすく
+        throw new Error(
+          `APIエラー ${res.status}: ${data?.error ?? "Unknown"} ${data?.detail ?? ""}`
+        );
+      }
+
+      setMsg("送信に成功しました ✅");
+      // 必要なら data を使ってUI反映
+      // console.log("updated:", data);
+    } catch (err: unknown) {
+      setMsg(
+        `送信に失敗しました ❌ ${err instanceof Error ? err.message : String(err)}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-start gap-2">
-      <button
-        onClick={handleClick}
-        disabled={loading}
-        className={`px-4 py-2 rounded-full  text-white font-medium shadow 
-          ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-rose-700 hover:bg-rose-600"}`}
-      >
-        {loading ? "送信中..." : "送信する"}
-      </button>
-      {message && <p className="text-sm text-gray-700">{message}</p>}
-    </div>
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
+    >
+      {loading ? "送信中..." : "送信"}
+      {msg && <span className="ml-2 text-sm">{msg}</span>}
+    </button>
   );
 }
