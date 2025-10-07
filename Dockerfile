@@ -1,18 +1,18 @@
-# Dockerfile
 FROM node:18-alpine
 
-# 作業ディレクトリを作成
 WORKDIR /app
 
-# 依存ファイルを先にコピーしてインストール
+# 依存だけ先に入れる
 COPY package.json package-lock.json ./
-RUN npm install
+# Prismaのschemaを先に用意（←ここが重要）
+COPY prisma ./prisma
+RUN npm ci
 
-# 残りのファイルをコピー
+# アプリ本体をコピー
 COPY . .
 
-# Next.js のデフォルトポートを開放
-EXPOSE 3000
+# 念のため明示的に生成（postinstallと二重でもOK）
+RUN npx prisma generate
 
-# devサーバー起動（ホットリロード対応）
-CMD ["npm", "run", "dev"]
+EXPOSE 3000
+CMD ["npm","run","dev"]

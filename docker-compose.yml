@@ -5,16 +5,15 @@ services:
       - .env
     ports:
       - "3000:3000"
-      - "5555:5555"  # Prisma Studio
+      - "5555:5555"
     volumes:
-      - .:/app        # ← :delegated を外す（必要なら :cached にする）
-      - /app/node_modules  # 匿名ボリュームで node_modules をコンテナ側に固定
+      - .:/app
+      - node_modules_cache:/app/node_modules   # ← 匿名ではなく名前付きに
     environment:
-      - WATCHPACK_POLLING=true         # Webpack/TSC の監視をポーリングに
-      - CHOKIDAR_USEPOLLING=true       # Chokidar をポーリングに
-      - CHOKIDAR_INTERVAL=200          # 監視頻度（ms）
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=200
       - TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling
-      # ↑ TypeScript の再ビルドが発火しない時に効く
     depends_on:
       - db
 
@@ -31,3 +30,4 @@ services:
 
 volumes:
   mysql:
+  node_modules_cache: {}
