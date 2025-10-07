@@ -12,10 +12,11 @@ const BodySchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
-  // URLの {id} を数値化
-  const urlEventId = Number(params.id);
+  // URLの {id} は event_id のこと（フロントで数字のみ保証）
+  const { id } = await context.params;
+  const urlEventId = Number(id);
   if (!Number.isInteger(urlEventId) || urlEventId < 0) {
     return NextResponse.json({ error: "Invalid path id" }, { status: 400 });
   }
