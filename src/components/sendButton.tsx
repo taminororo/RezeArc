@@ -1,16 +1,12 @@
 // src/components/sendButton.tsx
 "use client";
-
 import { useState } from "react";
 
-type CongestionStatus = "free" | "slightly_crowded" | "crowded" | "offtime";
-type TicketStatus = "distributing" | "limited" | "ended";
-
 type Props = {
-  eventId: string;
-  congestionStatus: CongestionStatus;
-  ticketStatus: TicketStatus;
-  eventText: string; // 必須ではないが空文字でもOK
+  eventId: string; // 文字列で来るので数値化してパスに使う
+  congestionStatus: "free" | "slightly_crowded" | "crowded" | "offtime";
+  ticketStatus: "distributing" | "limited" | "ended";
+  eventText: string;
 };
 
 export default function SendButton({
@@ -20,69 +16,66 @@ export default function SendButton({
   eventText,
 }: Props) {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string>("");
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const handleClick = async () => {
+  const onClick = async () => {
     setLoading(true);
-    setMessage("");
-
-    // かんたんバリデーション
-    const trimmedId = eventId.trim();
-    if (!trimmedId) {
-      setMessage("企画IDを入力してください。");
-      setLoading(false);
-      return;
-    }
-    if (!/^\d+$/.test(trimmedId)) {
-      setMessage("企画IDは半角数字のみで入力してください。");
-      setLoading(false);
-      return;
-    }
-
+    setMsg(null);
     try {
-      const res = await fetch(`/api/events/${trimmedId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // リクエストボディに props の値を送る
-        body: JSON.stringify({
-          congestionStatus,
-          ticketStatus,
-          eventText,
-        }),
-      });
-
-      if (!res.ok) {
-        // サーバーがエラー詳細を返す場合も拾う
-        let detail = "";
-        try {
-          const data = await res.json();
-          detail = data?.error || data?.message || "";
-        } catch (_) {}
-        throw new Error(detail || "API Error");
+      // ① 企画IDの正規化
+      const idNum = Number(String(eventId).trim());
+      if (!Number.isInteger(idNum) || idNum < 0) {
+        throw new Error("企画IDが不正です（半角の非負整数）");
       }
 
-      setMessage("送信に成功しました ✅");
+      // ② 値の正規化（trim + 小文字化。必要ならここにマッピングを追加）
+      const normCong = String(congestionStatus).trim().toLowerCase();
+      const normTicket = ticketStatus ? String(ticketStatus).trim().toLowerCase() : undefined;
+
+      // ③ ボディは API 仕様に合わせて「スネークケース」で作る
+      //    event_text は空なら送らない（nullは送らない！）
+      const body: Record<string, unknown> = {
+        congestion_status: normCong, // ← 必須
+        // ticket_status は不要なら省略してOK（isDistributingTicket=falseだとサーバでnullに矯正）
+        ...(normTicket ? { ticket_status: normTicket } : {}),
+        ...(eventText.trim() ? { event_text: eventText } : {}), // 空文字は送らない
+      };
+
+      const res = await fetch(`/api/events/${idNum}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        // サーバの詳細メッセージを画面に出してデバッグしやすく
+        throw new Error(
+          `APIエラー ${res.status}: ${data?.error ?? "Unknown"} ${data?.detail ?? ""}`
+        );
+      }
+
+      setMsg("送信に成功しました ✅");
+      // 必要なら data を使ってUI反映
+      // console.log("updated:", data);
     } catch (err: unknown) {
-      console.error(err);
-      setMessage(`送信に失敗しました ❌ ${err instanceof Error ? err.message : ""}`);
+      setMsg(
+        `送信に失敗しました ❌ ${err instanceof Error ? err.message : String(err)}`
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const disabled = loading || !eventId.trim();
-
   return (
-    <div className="flex flex-col items-start gap-2">
-      <button
-        onClick={handleClick}
-        disabled={disabled}
-        className={`px-4 py-2 rounded-full text-white font-medium shadow 
-          ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-rose-700 hover:bg-rose-600"}`}
-      >
-        {loading ? "送信中..." : "送信する"}
-      </button>
-      {message && <p className="text-sm text-gray-700">{message}</p>}
-    </div>
+    <button
+      onClick={onClick}
+      disabled={loading}
+      className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
+    >
+      {loading ? "送信中..." : "送信"}
+      {msg && <span className="ml-2 text-sm">{msg}</span>}
+    </button>
   );
 }
