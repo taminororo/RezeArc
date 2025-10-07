@@ -1,50 +1,84 @@
+// src/components/sendButton.tsx
 "use client";
-
-// クリックでAPIにPOSTリクエストを送り、成功・失敗メッセージを表示するボタンコンポーネント
-// loading状態の管理とスタイルの変更も含む
-// APIエンドポイントは仮のものなので、実際には適切なURLに変更してください
-// 例: fetch("/api/send", { method: "POST", ... })
 
 import { useState } from "react";
 
-export default function SendButton() {
+type CongestionStatus = "free" | "slightly_crowded" | "crowded" | "offtime";
+type TicketStatus = "distributing" | "limited" | "ended";
+
+type Props = {
+  eventId: string;
+  congestionStatus: CongestionStatus;
+  ticketStatus: TicketStatus;
+  eventText: string; // 必須ではないが空文字でもOK
+};
+
+export default function SendButton({
+  eventId,
+  congestionStatus,
+  ticketStatus,
+  eventText,
+}: Props) {
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
 
   const handleClick = async () => {
     setLoading(true);
     setMessage("");
 
+    // かんたんバリデーション
+    const trimmedId = eventId.trim();
+    if (!trimmedId) {
+      setMessage("企画IDを入力してください。");
+      setLoading(false);
+      return;
+    }
+    if (!/^\d+$/.test(trimmedId)) {
+      setMessage("企画IDは半角数字のみで入力してください。");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // 仮のPOSTリクエスト（API未実装なので失敗するかモック用）
-      const res = await fetch("/api/send", {
+      const res = await fetch(`/api/events/${trimmedId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ example: "data" }),
+        headers: { "Content-Type": "application/json" },
+        // リクエストボディに props の値を送る
+        body: JSON.stringify({
+          congestionStatus,
+          ticketStatus,
+          eventText,
+        }),
       });
 
       if (!res.ok) {
-        throw new Error("API Error");
+        // サーバーがエラー詳細を返す場合も拾う
+        let detail = "";
+        try {
+          const data = await res.json();
+          detail = data?.error || data?.message || "";
+        } catch (_) {}
+        throw new Error(detail || "API Error");
       }
 
       setMessage("送信に成功しました ✅");
-    } catch (err) {
-        console.error(err);
-      setMessage("送信に失敗しました ❌");
+    } catch (err: unknown) {
+      console.error(err);
+      setMessage(`送信に失敗しました ❌ ${err instanceof Error ? err.message : ""}`);
     } finally {
       setLoading(false);
     }
   };
 
+  const disabled = loading || !eventId.trim();
+
   return (
     <div className="flex flex-col items-start gap-2">
       <button
         onClick={handleClick}
-        disabled={loading}
-        className={`px-4 py-2 rounded-full  text-white font-medium shadow 
-          ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-rose-700 hover:bg-rose-600"}`}
+        disabled={disabled}
+        className={`px-4 py-2 rounded-full text-white font-medium shadow 
+          ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-rose-700 hover:bg-rose-600"}`}
       >
         {loading ? "送信中..." : "送信する"}
       </button>
