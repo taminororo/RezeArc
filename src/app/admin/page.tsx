@@ -18,9 +18,9 @@ type TicketStatus = "distributing" | "limited" | "ended";
 
 export default function AdminSettingsPage() {
   const [eventId, setEventId] = useState("");
-  const [congestion, setCongestion] = useState<CongestionStatus>("free");
-  const [ticket, setTicket] = useState<TicketStatus>("distributing");
-  const [description, setDescription] = useState("");
+  const [congestionStatus, setCongestion] = useState<CongestionStatus>("free");
+  const [ticketStatus, setTicket] = useState<TicketStatus>("distributing");
+  const [eventText, setEventText] = useState("");
 
   return (
     <div className="min-h-dvh w-full bg-[#e2e2e2] text-black">
@@ -53,7 +53,7 @@ export default function AdminSettingsPage() {
           <section className="space-y-3 mb-8">
             <QuestionTitle text="混雑状況" />
             <div className="mt-3">
-              <CongestionRadioButton value={congestion} onChange={setCongestion} />
+              <CongestionRadioButton value={congestionStatus} onChange={setCongestion} />
             </div>
           </section>
 
@@ -61,7 +61,7 @@ export default function AdminSettingsPage() {
           <section className="space-y-3 mb-8">
             <QuestionTitle text="整理券配布状況" />
             <div className="mt-3">
-              <TicketRadioButton value={ticket} onChange={setTicket} />
+              <TicketRadioButton value={ticketStatus} onChange={setTicket} />
             </div>
           </section>
 
@@ -71,7 +71,7 @@ export default function AdminSettingsPage() {
             <div className="mt-3">
               {/* 仕様上 TextField は input ですが、見た目をエリアっぽく高さだけ出します */}
               <div className="rounded-md border border-black p-3">
-                <TextField value={description} onChange={setDescription} />
+                <TextField value={eventText} onChange={setEventText} />
                 {/* 高さを稼ぐための余白（スマホのモックに寄せる） */}
                 <div className="h-24" />
               </div>
