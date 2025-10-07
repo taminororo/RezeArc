@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 
 import Header from "@/components/header";
-import EventCard from "@/components/eventCard";
+import EventCard from "@/components/eventcard";
 import Footer from "@/components/footer";
 import CongestionTag from "@/components/congestionTag";
 
@@ -38,7 +38,7 @@ export default function TicketDistributionPage() {
             {/* メインコンテンツ */}
             <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
                 {/* タイトル */}
-                <h1 className="text-center text-2xl font-bold mt-4 text-black">
+                <h1 className="text-center text-2xl font-bold mt-4 text-font font-title">
                     企画一覧
                 </h1>
 
