@@ -2,7 +2,7 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Accordion from "@/components/floorSelectAccordion";
-import MapDetail from "@/components/mapDetail";
+import Image from "next/image";
 
 /**
  * ポイント:
@@ -15,7 +15,15 @@ import MapDetail from "@/components/mapDetail";
  */
 export default function Page() {
   return (
-    <div className="relative min-h-dvh w-full flex flex-col items-center bg-white">
+    <div className="relative min-h-screen w-full flex flex-col items-center">
+        <div className="absolute inset-0 w-full -z-10">
+                <Image
+                  src="/backgroundNormal.svg"
+                  alt="背景"
+                  fill
+                  className="object-cover opacity-80"
+                />
+              </div>
       {/* ヘッダー */}
       <Header />
 
