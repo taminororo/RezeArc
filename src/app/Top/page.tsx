@@ -9,6 +9,7 @@ import CongestionTag from "@/components/congestionTag";
 import TicketTag from "@/components/ticketTag";
 import TicketEventList from "@/components/ticketEventTopCard";
 import DetailCard from "@/components/detailCard";
+import AllMap from "@/components/mapAll";
 
 export default function TicketDistributionPage() {
     return (
@@ -105,6 +106,7 @@ export default function TicketDistributionPage() {
                 <h2 className="text-center text-2xl font-bold mt-4 text-black flex items-center justify-center gap-2">
                     全体MAP
                 </h2>
+                <AllMap />
             </main>
 
             {/* フッター */}

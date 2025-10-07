@@ -29,14 +29,12 @@ export default function DetailCard({
       }}
       onClick={onClick}
     >
-      {title ? (
-        <h3 className="px-0 text-lg sm:text-lg font-semibold mt-6 mb-4">{title}</h3>
-      ) : (
-        <h3 className="px-2 text-lg sm:text-lg font-semibold mt-6 mb-4">
-          <span className="text-[#d72660]">企画</span>
-          <span className="text-black">を見る</span>
-        </h3>
+      {title && (
+        <div className="px-0 text-lg sm:text-lg font-semibold mt-6 mb-4">
+          {title}
+        </div>
       )}
+      
       <p className="px-2 text-sm sm:text-lg text-black mb-6">
         {description}
       </p>

@@ -2,6 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
+
 import {
   TransformWrapper,
   TransformComponent,
@@ -48,14 +50,18 @@ export default function MapWithPins({
               wrapperStyle={{ width: "100%", height: "100%" }}
               contentStyle={{ width: "100%", height: "100%" }}
             >
-              <img
-                src={imageSrc}
-                alt="キャンパスマップ"
-                className="w-full h-full object-contain select-none pointer-events-none"
-                draggable={false}
-              />
+              <div className="relative w-full bg-[#f6f4ef]" style={{ aspectRatio }}>
+                <Image
+                  src={imageSrc}
+                  alt="キャンパスマップ"
+                  fill
+                  draggable={false}
+                  className="object-contain select-none pointer-events-none"
+                  priority
+                />
+              </div>
 
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 z-50">
                 {pins.map((p) => (
                   <PinButton key={p.id} pin={p} />
                 ))}
