@@ -55,7 +55,7 @@ export default function MapWithPins({
                 draggable={false}
               />
 
-              <div className="absolute inset-0">
+              <div className="absolute inset-0 z-50 pointer-events-none">
                 {pins.map((p) => (
                   <PinButton key={p.id} pin={p} />
                 ))}
