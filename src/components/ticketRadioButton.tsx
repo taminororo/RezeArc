@@ -29,7 +29,7 @@ export default function TicketRadioButton({ value, onChange }: Props) {
         >
           <input
             type="radio"
-            name="congestion"
+            name="ticket"
             value={opt.key}
             checked={value === opt.key}
             onChange={() => onChange(opt.key)}
