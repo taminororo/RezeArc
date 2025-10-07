@@ -76,7 +76,9 @@ export default function Home() {
       </main>
 
       {/* フッター */}
-      <Footer />
+      <div className="w-full mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }
