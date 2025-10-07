@@ -25,7 +25,7 @@ export default function EventCard({
       type="button"
       onClick={onClick}
       className={
-        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#eee9e9] shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 " +
+        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-secondly shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 border-main " +
         className
       }
     >
