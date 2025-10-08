@@ -1,11 +1,14 @@
+// src/app/page.tsx（または該当のパス）
 "use client";
 
-import { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
+import useSWR from "swr";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import EventCard from "@/components/eventCard";
 import CongestionTag from "@/components/congestionTag";
+import { useLastUpdatedWatcher } from "@/hooks/useLastUpdatedWatcher";
 
 type ApiEvent = {
   event_id: number;
@@ -17,25 +20,26 @@ type ApiEvent = {
   updated_at: string;
 };
 
-export default function Home() {
-  const [events, setEvents] = useState<ApiEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+// 常に最新取得する fetcher
+const fetcher = async (url: string): Promise<ApiEvent[]> => {
+  const res = await fetch(url, { cache: "no-store", next: { revalidate: 0 } });
+  if (!res.ok) throw new Error(`GET ${url} failed: ${res.status}`);
+  return (await res.json()) as ApiEvent[];
+};
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/events", { cache: "no-store" });
-        if (!res.ok) throw new Error("API error");
-        const data: ApiEvent[] = await res.json();
-        // isDistributingTicket === false のみ抽出
-        setEvents(data.filter((e) => e.isDistributingTicket === false));
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+export default function Home() {
+  const { data, isLoading, error } = useSWR<ApiEvent[]>("/api/events", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  // DBの last-updated を監視して差分があれば mutate("/api/events")
+  useLastUpdatedWatcher({ keys: ["/api/events"], intervalMs: 2000 });
+
+  // isDistributingTicket === false のみ抽出
+  const events = React.useMemo<ApiEvent[]>(
+    () => (data ?? []).filter((e) => e.isDistributingTicket === false),
+    [data]
+  );
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center">
@@ -58,20 +62,32 @@ export default function Home() {
           企画一覧
         </h1>
 
-        {loading && <p className="mt-4 text-gray-600">読み込み中...</p>}
+        {isLoading && <p className="mt-4 text-gray-600">読み込み中...</p>}
+        {error && (
+          <p className="mt-4 text-red-600">
+            読み込みに失敗しました：{error instanceof Error ? error.message : String(error)}
+          </p>
+        )}
 
         <div className="w-full max-w-sm flex flex-col gap-4 mt-6 px-2">
-          {events.map((e) => (
-            <EventCard
-              key={e.event_id}
-              imageSrc={e.image_path ?? "/event_photo1.svg"}
-              title={e.event_name}
-              statusComponent={<CongestionTag status={e.congestion_status} />}
-              onClick={() => {
-                console.log("clicked:", e.event_id);
-              }}
-            />
-          ))}
+          {!isLoading &&
+            events.map((e) => (
+              <EventCard
+                key={e.event_id}
+                imageSrc={e.image_path ?? "/event_photo1.svg"}
+                title={e.event_name}
+                statusComponent={<CongestionTag status={e.congestion_status} />}
+                onClick={() => {
+                  console.log("clicked:", e.event_id);
+                }}
+              />
+            ))}
+
+          {!isLoading && !error && events.length === 0 && (
+            <div className="text-sm text-slate-700 bg-white/70 rounded-lg p-4">
+              表示できる企画がありません。
+            </div>
+          )}
         </div>
       </main>
 

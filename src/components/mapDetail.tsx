@@ -1,30 +1,27 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import Image from "next/image";
-import CongestionPoint, { type CongestionStatus } from "./congestionPoint";
+import useSWR from "swr";
+import CongestionPoint, { CongestionStatus } from "@/components/congestionPoint";
+import { useLastUpdatedWatcher } from "@/hooks/useLastUpdatedWatcher";
 
-/**
- * API から返るイベント1件の型
- * /api/events: event_id / congestion_status などを返す
- */
+// /api/events の型
 type ApiEvent = {
   event_id: number;
   congestion_status: CongestionStatus;
-  // ほかのフィールドも来るが今回は未使用
+  isDistributingTicket: boolean;
+  image_path?: string | null;
+  updated_at: string;
 };
 
-/**
- * マップ上に置くポイント定義
- * - id: これが event_id と一致する想定（不変）
- * - x, y: 画像左上を(0,0)・右下を(100,100)としたパーセンテージ座標
- * - label: デバッグ/将来のツールチップ用
- */
-type MapPoint = {
+// Map に配置するポイント定義
+export type MapPoint = {
   id: number;
-  x: number; // %
-  y: number; // %
-  label?: string;
+  label: string;
+  x: number;   // %
+  y: number;   // %
+  size?: number;
 };
 
 /** ここが「不変の割り当て表」: SVG 上の座標に応じて、恒久的に ID を割り当てる */
@@ -40,69 +37,80 @@ const POINTS: MapPoint[] = [
   // 必要に応じて増やす
 ];
 
-export default function MapDetail() {
-  const [events, setEvents] = useState<ApiEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+type Props = {
+  mapImageSrc?: string;
+  height?: number; // px
+};
 
-  // 初期ロードで /api/events を取得
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/events", { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to fetch /api/events");
-        const data: ApiEvent[] = await res.json();
-        setEvents(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+const fetcher = async (url: string): Promise<ApiEvent[]> => {
+  const r = await fetch(url, { cache: "no-store", next: { revalidate: 0 } });
+  if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
+  return (await r.json()) as ApiEvent[];
+};
 
-  // event_id -> congestion_status のルックアップマップ
-  const statusById = useMemo(() => {
-    const map = new Map<number, CongestionStatus>();
-    for (const e of events) map.set(e.event_id, e.congestion_status);
-    return map;
-  }, [events]);
+export default function MapDetail({
+  mapImageSrc = "/map_default.svg",
+  height = 420,
+}: Props) {
+  const { data, isLoading, error } = useSWR<ApiEvent[]>("/api/events", fetcher, {
+    revalidateOnFocus: false,
+  });
+
+  // last-updated を監視 → 差分があれば mutate("/api/events")
+  useLastUpdatedWatcher({ keys: ["/api/events"], intervalMs: 2000 });
+
+  // event_id → congestion_status の辞書
+  const statusByEventId = React.useMemo(() => {
+    const dict = new Map<number, CongestionStatus>();
+    for (const ev of data ?? []) dict.set(ev.event_id, ev.congestion_status);
+    return dict;
+  }, [data]);
 
   return (
     <div className="w-full">
-      {/* 画像は拡大不可 → ただの静的表示。ラッパーは relative にして子を absolute 配置 */}
-      <div className="relative mx-auto w-full max-w-5xl">
-        {/* Next/Image で固定比率 & 画質確保 */}
+      <div
+        className="relative w-full rounded-lg overflow-hidden shadow"
+        style={{ height }}
+      >
+        {/* 地図背景 */}
         <Image
-          src="/map_1Fv2.svg"
-          alt="1F Map"
-          width={1600}
-          height={900}
-          className="w-full h-auto select-none pointer-events-none"
-          priority
+          src={"/map_1Fv2.svg"}
+          alt="会場マップ"
+          fill
+          className="object-contain bg-white"
         />
 
-        {/* ポイント群（画像の上に絶対配置） */}
-        <div className="absolute inset-0">
-          {POINTS.map((p) => {
-            const status = statusById.get(p.id) ?? "offtime";
-            return (
-              <div
-                key={p.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: `${p.x}%`, top: `${p.y}%` }}
-              >
-                {/* CongestionPoint に id と status を渡す */}
-                <CongestionPoint id={p.id} status={status} />
-              </div>
-            );
-          })}
-        </div>
+        {/* ポイント配置 */}
+        {POINTS.map((p) => {
+          const status: CongestionStatus =
+            statusByEventId.get(p.id) ?? "offtime";
+          const size = p.size ?? 14;
+          return (
+            <div
+              key={p.id}
+              className="absolute flex items-center gap-1"
+              style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
+              <CongestionPoint id={p.id} status={status} size={size} />
+              <span className="text-[10px] font-semibold text-black drop-shadow-sm bg-white/70 rounded px-1 py-0.5">
+                {p.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
 
-        {/* 参考: ローディング or 取得失敗の簡易表示（任意） */}
-        {!loading && events.length === 0 && (
-          <p className="absolute bottom-2 right-2 text-xs bg-white/80 px-2 py-1 rounded">
-            データが見つかりません（全点 offtime 表示）
-          </p>
+      {/* 読み込み/エラー表示 */}
+      <div className="mt-2 text-xs text-neutral-600">
+        {isLoading && "混雑状況を取得中…"}
+        {error && (
+          <span className="text-rose-700">
+            取得に失敗：{error instanceof Error ? error.message : String(error)}
+          </span>
         )}
       </div>
     </div>

@@ -45,17 +45,20 @@ docker compose exec next-app npx prisma generate
 # 3. データベースマイグレーションを実行
 docker compose exec next-app npx prisma migrate dev --name init
 
+# 4. seedデータの生成
+docker compose exec next-app npm run seed
+
 # 4. データベース接続確認（オプション）
 docker compose exec next-app npx prisma studio
 
-## MySQLに入る
+
+## MySQLに入る（オプション）
 docker compose exec -it db sh
-## ログイン
+## ログイン（オプション）
 mysql -u root -p
 
-## DBを見る
+## DBを見る（オプション）
 show databases;
 
-## seedデータの生成
-docker compose exec next-app npm run seed
+
 

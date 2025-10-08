@@ -2,8 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { bus } from "@/lib/bus";
 
-// event_id は params から受け取るので BodySchema から削除
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const BodySchema = z.object({
   ticket_status: z.enum(["distributing", "limited", "ended"]).nullable().optional(),
   congestion_status: z.enum(["free", "slightly_crowded", "crowded", "offtime"]),
@@ -12,38 +15,23 @@ const BodySchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> } // ← このままでもOK、気になるなら Promise を外してもOK
 ) {
-  // URLの {id} は event_id のこと（フロントで数字のみ保証）
   const { id } = await context.params;
   const urlEventId = Number(id);
-  if (!Number.isInteger(urlEventId) || urlEventId < 0) {
-    return NextResponse.json({ error: "Invalid path id" }, { status: 400 });
-  }
 
   let body: z.infer<typeof BodySchema>;
   try {
     body = BodySchema.parse(await req.json());
   } catch (e) {
-    return NextResponse.json(
-      { error: "Invalid body", detail: String(e) },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid body", detail: String(e) }, { status: 400 });
   }
 
-  // 対象レコード取得
-  const existing = await prisma.event.findUnique({
-    where: { eventId: urlEventId },
-  });
-  if (!existing) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
-  }
+  const existing = await prisma.event.findUnique({ where: { eventId: urlEventId } });
+  if (!existing) return NextResponse.json({ error: "Event not found" }, { status: 404 });
 
-  // isDistributingTicket が false の場合 ticket_status は null に強制
   const nextTicketStatus =
-    existing.isDistributingTicket
-      ? body.ticket_status ?? existing.ticketStatus ?? "distributing"
-      : null;
+    existing.isDistributingTicket ? body.ticket_status ?? existing.ticketStatus ?? "distributing" : null;
 
   const updated = await prisma.event.update({
     where: { eventId: urlEventId },
@@ -53,6 +41,15 @@ export async function POST(
       eventText: body.event_text?.trim() ? body.event_text : null,
     },
   });
+
+  // ←←← ここで “同じ bus” に対して emit
+  try {
+    console.log("[events:update] emit", updated.eventId);
+    bus.emitUpdate({ type: "eventUpdated", eventId: updated.eventId });
+    console.log("[events:update] emitted");
+  } catch (e) {
+    console.warn("[events:update] emit failed", e);
+  }
 
   return NextResponse.json(
     {
