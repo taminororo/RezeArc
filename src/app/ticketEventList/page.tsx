@@ -1,4 +1,3 @@
-// src/app/ticketEventList/page.tsx
 "use client";
 
 import React from "react";
@@ -9,8 +8,9 @@ import Footer from "@/components/footer";
 import EventCard from "@/components/eventCard";
 import CongestionTag from "@/components/congestionTag";
 import TicketTag from "@/components/ticketTag";
-import { useLiveInvalidate } from "@/hooks/useLiveInvalidate";
+import { useLastUpdatedWatcher } from "@/hooks/useLastUpdatedWatcher";
 
+// APIの型定義
 type ApiEvent = {
   event_id: number;
   event_name: string;
@@ -23,35 +23,37 @@ type ApiEvent = {
   imagePath?: string | null;  // camelCase対応
 };
 
-const fetcher = (url: string) =>
-  fetch(url, { cache: "no-store", next: { revalidate: 0 } }).then((r) => {
-    if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
-    return r.json();
-  });
+// fetcherの型
+const fetcher = async (url: string): Promise<ApiEvent[]> => {
+  const res = await fetch(url, { cache: "no-store", next: { revalidate: 0 } });
+  if (!res.ok) {
+    throw new Error(`GET ${url} failed: ${res.status}`);
+  }
+  return res.json() as Promise<ApiEvent[]>;
+};
 
 export default function TicketDistributionPage() {
-  // SWR で一覧取得（フォーカス時再検証はSSEに任せる）
   const { data, isLoading, error } = useSWR<ApiEvent[]>("/api/events", fetcher, {
     revalidateOnFocus: false,
   });
 
-  // SSE購読 → /api/events を mutate
-  useLiveInvalidate(["/api/events"]);
+  // 🔑 DBの last-updated を監視して差分があれば mutate("/api/events")
+  useLastUpdatedWatcher({ keys: ["/api/events"], intervalMs: 2000 });
 
-  const [query, setQuery] = React.useState("");
+  const [query, setQuery] = React.useState<string>("");
 
-  // 1) 配布中のみ
-  const distributing = React.useMemo(() => {
-    const all = data ?? [];
-    return all.filter((e) => e.isDistributingTicket === true);
-  }, [data]);
+  // 整理券を配布している企画のみ
+  const distributing = React.useMemo<ApiEvent[]>(
+    () => (data ?? []).filter((e) => e.isDistributingTicket),
+    [data]
+  );
 
-  // 2) 企画名検索（空なら全件）
-  const q = query.trim().toLowerCase();
-  const filtered = React.useMemo(() => {
+  // 検索フィルタ
+  const filtered = React.useMemo<ApiEvent[]>(() => {
+    const q = query.trim().toLowerCase();
     if (!q) return distributing;
     return distributing.filter((e) => (e.event_name ?? "").toLowerCase().includes(q));
-  }, [distributing, q]);
+  }, [distributing, query]);
 
   return (
     <div className="relative min-h-screen w-full h-full flex flex-col items-center">
@@ -87,7 +89,11 @@ export default function TicketDistributionPage() {
           <p className="text-sm text-neutral-600">
             表示件数: {filtered.length} / 配布中 {distributing.length} 件 / 全{" "}
             {(data ?? []).length} 件 {isLoading && "(読み込み中…)"}
-            {error && <span className="text-rose-700 ml-2">エラー: {String(error.message ?? error)}</span>}
+            {error && (
+              <span className="text-rose-700 ml-2">
+                エラー: {error instanceof Error ? error.message : String(error)}
+              </span>
+            )}
           </p>
         </div>
 
@@ -105,13 +111,9 @@ export default function TicketDistributionPage() {
                     ev.ticket_status ? <TicketTag status={ev.ticket_status} /> : undefined
                   }
                   statusComponent={<CongestionTag status={ev.congestion_status} />}
-                  onClick={() => {
-                    // 詳細ページに繋ぐならここで router.push など
-                  }}
                 />
               );
             })}
-
           {!isLoading && filtered.length === 0 && (
             <div className="text-sm text-slate-700 bg-white/70 rounded-lg p-4">
               条件に一致する企画はありません。

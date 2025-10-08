@@ -12,9 +12,9 @@ import TicketTag from "@/components/ticketTag";
 import TicketEventList from "@/components/ticketEventTopCard";
 import DetailCard from "@/components/detailCard";
 import AllMap from "@/components/mapAll";
-import { useLiveInvalidate } from "@/hooks/useLiveInvalidate";
+import { useLastUpdatedWatcher } from "@/hooks/useLastUpdatedWatcher";
 
-// /api/events のレスポンス形（既存APIに準拠）
+// /api/events のレスポンス型
 type ApiEvent = {
   event_id: number;
   event_name: string;
@@ -27,25 +27,26 @@ type ApiEvent = {
   updated_at?: string;
 };
 
-const fetcher = (url: string) =>
-  fetch(url, { cache: "no-store", next: { revalidate: 0 } }).then((r) => {
-    if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
-    return r.json();
-  });
+// fetcher（常に最新取得）
+const fetcher = async (url: string): Promise<ApiEvent[]> => {
+  const r = await fetch(url, { cache: "no-store", next: { revalidate: 0 } });
+  if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
+  return (await r.json()) as ApiEvent[];
+};
 
 export default function TicketDistributionPage() {
-  // SWRで一覧を取得（フォーカス時の再検証は不要。SSEで更新します）
+  // SWRで一覧を取得（フォーカス時の再検証は不要。ロングポーリングで更新）
   const { data, isLoading, error } = useSWR<ApiEvent[]>("/api/events", fetcher, {
     revalidateOnFocus: false,
   });
 
-  // SSE（/api/events/stream）で更新通知を購読→/api/events を mutate
-  useLiveInvalidate(["/api/events"]);
+  // DBの last-updated を監視して差分があれば mutate("/api/events")
+  useLastUpdatedWatcher({ keys: ["/api/events"], intervalMs: 2000 });
 
   // 整理券を配布中かつ「残りわずか(limited)」のみ抽出
-  const limitedEvents = useMemo(() => {
-    if (!data) return [];
-    return data.filter(
+  const limitedEvents = useMemo<ApiEvent[]>(() => {
+    const list = data ?? [];
+    return list.filter(
       (e) => e.isDistributingTicket === true && e.ticket_status === "limited"
     );
   }, [data]);
@@ -94,16 +95,16 @@ export default function TicketDistributionPage() {
           {isLoading ? (
             <p className="text-gray-600">読み込み中...</p>
           ) : error ? (
-            <p className="text-red-600">読み込みに失敗しました。</p>
+            <p className="text-red-600">
+              読み込みに失敗しました：{error instanceof Error ? error.message : String(error)}
+            </p>
           ) : (
             <TicketEventList
               events={limitedEvents.map((e) => ({
                 imageSrc: e.image_path ?? "/event_photo1.svg",
                 title: e.event_name,
                 topTagComponent: <TicketTag status="limited" />,
-                bottomTagComponent: (
-                  <CongestionTag status={e.congestion_status} />
-                ),
+                bottomTagComponent: <CongestionTag status={e.congestion_status} />,
                 onClick: () => {
                   console.log("clicked:", e.event_id);
                 },
