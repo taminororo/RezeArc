@@ -16,14 +16,14 @@ import Image from "next/image";
 export default function Page() {
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center">
-        <div className="absolute inset-0 w-full -z-10">
-                <Image
-                  src="/backgroundNormal.svg"
-                  alt="背景"
-                  fill
-                  className="object-cover opacity-80"
-                />
-              </div>
+      <div className="absolute inset-0 w-full -z-10">
+        <Image
+          src="/backgroundNormal.svg"
+          alt="背景"
+          fill
+          className="object-cover opacity-80"
+        />
+      </div>
       {/* ヘッダー */}
       <Header />
 
@@ -34,16 +34,18 @@ export default function Page() {
 
         {/* フロア選択（必要に応じて項目を追加してください） */}
         <div className="w-full max-w-3xl">
-            <Accordion title="講義棟 1F" />
-            <Accordion title="講義棟 2F" />
-            <Accordion title="講義棟 3F" />
+          <Accordion title="講義棟 1F" />
+          <Accordion title="講義棟 2F" />
+          <Accordion title="講義棟 3F" />
 
         </div>
 
       </main>
 
       {/* フッター */}
-      <Footer />
+      <div className="w-full mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }
