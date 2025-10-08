@@ -17,7 +17,7 @@ export default function EventCard({
   title,
   statusComponent,
   statusTicket,
-  className = "",
+  className = "bg-secondly border-main",
   onClick,
 }: EventCardProps) {
   return (
@@ -25,13 +25,13 @@ export default function EventCard({
       type="button"
       onClick={onClick}
       className={
-        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#fcf6ee] shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 border-main " +
+        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#fcf6ee] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 border-main " +
         className
       }
     >
       {/* 左側: 画像とイベント名 */}
       <div className="flex items-center gap-3">
-        <div className="relative w-12 h-12 bg-gray-300 rounded-sm overflow-hidden">
+        <div className="relative w-12 h-12 bg-secondly rounded-sm overflow-hidden">
           <Image src={imageSrc} alt={title} fill className="object-cover" />
         </div>
         <span className="text-lg font-medium text-[#fcf6ee]">{title}</span>

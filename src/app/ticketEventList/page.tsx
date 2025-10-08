@@ -67,7 +67,7 @@ export default function TicketDistributionPage() {
   );
 
   return (
-    <div className="relative min-h-screen w-full h-full flex flex-col items-center">
+    <div className="relative min-h-screen w-full h-full flex flex-col items-center ">
       {/* 背景画像 */}
       <div className="absolute inset-0 w-full -z-10">
         <Image
@@ -95,9 +95,9 @@ export default function TicketDistributionPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="企画名で検索（例：お化け屋敷）"
-            className="border rounded px-3 py-2 w-72"
+            className="border rounded px-3 py-2 w-72 bg-secondly rounded-full text-center"
           />
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-neutral-600 text-center">
             表示件数: {filtered.length} / 配布中 {distributing.length} 件 / 全{" "}
             {all.length} 件 {loading && "(読み込み中…)"}
             {error && <span className="text-rose-700 ml-2">エラー: {error}</span>}
