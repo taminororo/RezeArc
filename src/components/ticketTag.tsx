@@ -21,11 +21,19 @@ const LABELS: Record<TicketStatus, string> = {
 const STYLE: Record<TicketStatus, string> = {
   // 画像の雰囲気に寄せて、丸 pill + ボーダー + わずかは黄色系
   distributing:
+<<<<<<< HEAD
     "bg-not_crowded text-font border-main",
   limited:
     "bg-slightly_crowded text-font border-main", // 黄色 + 濃いめの縁取り
   ended:
     "bg-crowded text-font border-main",
+=======
+    "bg-not_crowded text-font border-main font-main_text", // 緑 + 濃いめの縁取り
+  limited:
+    "bg-slightly_crowded text-font border-main font-main_text", // 黄色 + 濃いめの縁取り
+  ended:
+    "bg-crowded text-font border-main font-main_text", // 赤 + 濃いめの縁取り
+>>>>>>> 3db8284aa20105ba73bab998df3bcb2c333551e9
 };
 
 export default function TicketTag({

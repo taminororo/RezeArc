@@ -34,7 +34,7 @@ export default function EventCard({
         <div className="relative w-12 h-12 bg-gray-300 rounded-sm overflow-hidden">
           <Image src={imageSrc} alt={title} fill className="object-cover" />
         </div>
-        <span className="text-lg font-medium text-[#111827]">{title}</span>
+        <span className="text-lg font-medium text-font">{title}</span>
       </div>
 
       {/* 右側: 混雑状況 + チケット情報 */}

@@ -24,10 +24,17 @@ const LABELS: Record<CongestionStatus, string> = {
 };
 
 const STYLE: Record<CongestionStatus, string> = {
+<<<<<<< HEAD
   free: "bg-not_crowded text-font border-main",
   slightly_crowded: "bg-slightly_crowded text-font border-main",
   crowded: "bg-crowded text-font border-main",
   offtime: "bg-after_hours text-font border-main",
+=======
+  free: "bg-not_crowded text-font border-main font-main_text",
+  slightly_crowded: "bg-slightly_crowded text-font border-main font-main_text",
+  crowded: "bg-crowded text-font border-main font-main_text",
+  offtime: "bg-after_hours text-font border-main font-main_text",
+>>>>>>> 3db8284aa20105ba73bab998df3bcb2c333551e9
 };
 
 export default function CongestionTag({
@@ -37,7 +44,11 @@ export default function CongestionTag({
 }: CongestionTagProps) {
   const label = LABELS[status];
   const base =
+<<<<<<< HEAD
     "flex items-center justify-center rounded-lg w-[110px] h-[25px] text-base text-medium tracking-wide " +
+=======
+    "inline-flex items-center rounded-full w-[110px] h-[25px] px-4 py-1.5 text-base font-semibold tracking-wide " +
+>>>>>>> 3db8284aa20105ba73bab998df3bcb2c333551e9
     "border shadow-sm transition-colors";
   const classes = `${base} ${STYLE[status]} ${className}`;
 

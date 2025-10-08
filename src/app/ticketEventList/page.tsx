@@ -4,6 +4,10 @@
 import React from "react";
 import Image from "next/image";
 import Header from "@/components/header";
+<<<<<<< HEAD
+=======
+import EventCard from "@/components/eventcard";
+>>>>>>> 3db8284aa20105ba73bab998df3bcb2c333551e9
 import Footer from "@/components/footer";
 import EventCard from "@/components/eventCard";
 import CongestionTag from "@/components/congestionTag";
@@ -54,6 +58,7 @@ export default function TicketDistributionPage() {
     [all]
   );
 
+<<<<<<< HEAD
   // 2) 企画名検索（入力が空なら全件）
   const q = query.trim().toLowerCase();
   const filtered = React.useMemo(
@@ -65,6 +70,14 @@ export default function TicketDistributionPage() {
         : distributing,
     [distributing, q]
   );
+=======
+            {/* メインコンテンツ */}
+            <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
+                {/* タイトル */}
+                <h1 className="text-center text-2xl font-bold mt-4 text-font font-title">
+                    整理券配布企画一覧
+                </h1>
+>>>>>>> 3db8284aa20105ba73bab998df3bcb2c333551e9
 
   return (
     <div className="relative min-h-screen w-full h-full flex flex-col items-center">
@@ -88,6 +101,9 @@ export default function TicketDistributionPage() {
         <h1 className="text-center text-2xl font-bold mt-4 text-font font-title ">
           整理券配布企画一覧
         </h1>
+                    <p className="text-sm text-neutral-600 font-main_text">
+                        表示件数: {results.length} / 全{all.length}件 {loading && "(読み込み中…)"}
+                    </p>
 
         {/* 検索UI */}
         <div className="p-6 space-y-3">
