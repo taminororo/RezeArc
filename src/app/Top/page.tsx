@@ -1,8 +1,9 @@
 // src/app/Top/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
+import useSWR from "swr";
 
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -11,6 +12,7 @@ import TicketTag from "@/components/ticketTag";
 import TicketEventList from "@/components/ticketEventTopCard";
 import DetailCard from "@/components/detailCard";
 import AllMap from "@/components/mapAll";
+import { useLiveInvalidate } from "@/hooks/useLiveInvalidate";
 
 // /api/events のレスポンス形（既存APIに準拠）
 type ApiEvent = {
@@ -25,29 +27,27 @@ type ApiEvent = {
   updated_at?: string;
 };
 
+const fetcher = (url: string) => fetch(url).then((r) => {
+  if (!r.ok) throw new Error(`Fetch failed: ${r.status}`);
+  return r.json();
+});
+
 export default function TicketDistributionPage() {
-  const [limitedEvents, setLimitedEvents] = useState<ApiEvent[]>([]);
-  const [loading, setLoading] = useState(true);
+  // SWRで一覧を取得（フォーカス時の再検証は不要。SSEで更新します）
+  const { data, isLoading, error } = useSWR<ApiEvent[]>("/api/events", fetcher, {
+    revalidateOnFocus: false,
+  });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/events", { cache: "no-store" });
-        if (!res.ok) throw new Error("API error");
-        const data: ApiEvent[] = await res.json();
+  // SSE（/api/events/stream）で更新通知を購読→/api/events を mutate
+  useLiveInvalidate(["/api/events"]);
 
-        // 整理券を配布中かつ「残りわずか(limited)」のみ抽出
-        const filtered = data.filter(
-          (e) => e.isDistributingTicket === true && e.ticket_status === "limited"
-        );
-        setLimitedEvents(filtered);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // 整理券を配布中かつ「残りわずか(limited)」のみ抽出
+  const limitedEvents = useMemo(() => {
+    if (!data) return [];
+    return data.filter(
+      (e) => e.isDistributingTicket === true && e.ticket_status === "limited"
+    );
+  }, [data]);
 
   return (
     <div className="relative flex-1 w-full flex flex-col items-center">
@@ -90,8 +90,10 @@ export default function TicketDistributionPage() {
         </h2>
 
         <div className="px-8 mt-3 mb-8 w-full max-w-2xl">
-          {loading ? (
+          {isLoading ? (
             <p className="text-gray-600">読み込み中...</p>
+          ) : error ? (
+            <p className="text-red-600">読み込みに失敗しました。</p>
           ) : (
             <TicketEventList
               events={limitedEvents.map((e) => ({

@@ -2,6 +2,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { bus } from "@/lib/bus"; // ← 追加：SSE 用ブロードキャスト
+
+// Edge だと SSE が切れやすいので Node 実行を明示（任意だが推奨）
+export const runtime = "nodejs";
 
 // event_id は params から受け取るので BodySchema から削除
 const BodySchema = z.object({
@@ -53,6 +57,13 @@ export async function POST(
       eventText: body.event_text?.trim() ? body.event_text : null,
     },
   });
+
+  // --- ここで通知を発火（SSE購読側が mutate して最新化）---
+  try {
+    bus.emit({ type: "eventUpdated", eventId: updated.eventId });
+  } catch {
+    // 通知で失敗してもDB更新は成功しているので API は 200 を返す
+  }
 
   return NextResponse.json(
     {
