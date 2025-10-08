@@ -1,16 +1,21 @@
 // src/lib/bus.ts
-type Listener = (payload: unknown) => void;
+import { EventEmitter } from "events";
 
-class Bus {
-  private listeners = new Set<Listener>();
-  on(fn: Listener) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
-  emit(payload: unknown) { for (const fn of this.listeners) fn(payload); }
-}
-
-// HMRでも同じインスタンスを再利用する
-const g = globalThis as unknown as { __rezeArcBus?: Bus };
-export const bus = g.__rezeArcBus ?? (g.__rezeArcBus = new Bus());
-
-export type EventPayload =
+type Payload =
   | { type: "eventUpdated"; eventId: number }
   | { type: "bulkInvalidate" };
+
+type Bus = EventEmitter & { emitUpdate: (p: Payload) => void };
+
+const g = globalThis as unknown as { __rezeArcBus?: Bus };
+
+export const bus: Bus =
+  g.__rezeArcBus ??
+  (g.__rezeArcBus = Object.assign(new EventEmitter(), {
+    // this を明示的に Bus として注釈することで this.emit が使えるようにする
+    emitUpdate(this: Bus, p: Payload) {
+      this.emit("update", p);
+    },
+  }));
+
+export type EventPayload = Payload;
