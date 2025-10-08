@@ -24,7 +24,7 @@ type ApiEvent = {
 };
 
 const fetcher = (url: string) =>
-  fetch(url).then((r) => {
+  fetch(url, { cache: "no-store", next: { revalidate: 0 } }).then((r) => {
     if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
     return r.json();
   });

@@ -27,10 +27,11 @@ type ApiEvent = {
   updated_at?: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((r) => {
-  if (!r.ok) throw new Error(`Fetch failed: ${r.status}`);
-  return r.json();
-});
+const fetcher = (url: string) =>
+  fetch(url, { cache: "no-store", next: { revalidate: 0 } }).then((r) => {
+    if (!r.ok) throw new Error(`GET ${url} failed: ${r.status}`);
+    return r.json();
+  });
 
 export default function TicketDistributionPage() {
   // SWRで一覧を取得（フォーカス時の再検証は不要。SSEで更新します）
