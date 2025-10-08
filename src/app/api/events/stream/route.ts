@@ -2,45 +2,53 @@
 import { NextRequest } from "next/server";
 import { bus, type EventPayload } from "@/lib/bus";
 
-export const runtime = "nodejs"; // EdgeだとSSEが切れやすいのでNode推奨
+export const runtime = "nodejs";             // Edgeでの切断を避ける
+export const dynamic = "force-dynamic";      // 常に動的実行
+export const revalidate = 0;                 // キャッシュ無効
 
-export async function GET(_req: NextRequest) {
-  const stream = new ReadableStream({
-    start(controller) {
-      const enc = new TextEncoder();
+export async function GET(req: NextRequest) {
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const enc = new TextEncoder();
 
-      // 接続直後にheart beat開始（Heroku/Render/Proxy対策）
-      const interval = setInterval(() => {
-        controller.enqueue(enc.encode(`event: ping\ndata: {}\n\n`));
-      }, 15000);
+  const write = (text: string) => writer.write(enc.encode(text));
 
-      // ブロードキャストを購読
-      // → bus.on のリスナーは unknown を受け取る設計のため、ここで EventPayload にアサートして扱う
-      const unsubscribe = bus.on((payload: unknown) => {
-        const ev = payload as EventPayload;
-        controller.enqueue(enc.encode(`event: update\ndata: ${JSON.stringify(ev)}\n\n`));
-      });
+  // 心拍（ProxyやKeep-Alive維持）
+  const heartbeat = setInterval(() => {
+    write(`event: ping\ndata: {}\n\n`);
+  }, 15000);
 
-      // 初回は全体再検証させたい場合（任意）
-      controller.enqueue(enc.encode(`event: hello\ndata: {}\n\n`));
+  // 接続時に初回イベントを送る（接続確認＋初期再検証のトリガに使える）
+  write(`event: hello\ndata: {}\n\n`);
 
-      // 接続終了時の掃除
-      const cancel = () => {
-        clearInterval(interval);
-        unsubscribe();
-      };
-      // @ts-expect-error - Web Streamsの仕様上close時hookがこれ
-      controller.oncancel = cancel;
-      // @ts-expect-error - Web Streamsの仕様上close時hookがこれ
-      controller.onclose = cancel;
+  // bus購読
+  const unsubscribe = bus.on((payload: unknown) => {
+    // 簡易の型ガード／アサーション
+    const ev = payload as EventPayload;
+    if (ev && (ev.type === "bulkInvalidate" || (ev.type === "eventUpdated" && typeof ev.eventId === "number"))) {
+      write(`event: update\ndata: ${JSON.stringify(ev)}\n\n`);
     }
   });
 
-  return new Response(stream, {
+  // クライアント切断（AbortSignal）
+  const close = () => {
+    clearInterval(heartbeat);
+    try { unsubscribe(); } catch { /* safe-ignore */ }
+    // writer を閉じてストリームを終了
+    writer.close().catch(() => {});
+    try { req.signal.removeEventListener("abort", close); } catch { /* noop */ }
+  };
+
+  req.signal.addEventListener("abort", close);
+
+  return new Response(readable, {
     headers: {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      "Connection": "keep-alive",
+      // 重要：一部環境で圧縮されるとSSEが壊れることがある
+      "Content-Encoding": "none",
+      "X-Accel-Buffering": "no", // Nginx等のバッファ無効化対策
     },
   });
 }
