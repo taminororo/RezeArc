@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-        "postinstall": "prisma generate",
+    "postinstall": "prisma generate",
     "dev": "prisma generate && next dev -H 0.0.0.0 -p 3000",
     "build": "next build --turbopack",
     "start": "next start",
@@ -23,6 +23,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-zoom-pan-pinch": "^3.7.0",
+    "swr": "^2.3.6",
     "zod": "^4.1.11"
   },
   "devDependencies": {
