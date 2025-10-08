@@ -12,7 +12,6 @@ export default function MapPage() {
 
   return (
     <main className="min-h-dvh w-full flex flex-col items-center p-4">
-      <h1 className="text-2xl font-bold text-black mb-4">キャンパスマップ</h1>
 
       <MapWithPins
         imageSrc="/map_all.svg"

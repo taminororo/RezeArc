@@ -25,7 +25,7 @@ export default function EventCard({
       type="button"
       onClick={onClick}
       className={
-        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#eee9e9] shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 " +
+        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#fcf6ee] shadow-sm hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 border-main " +
         className
       }
     >
@@ -34,7 +34,7 @@ export default function EventCard({
         <div className="relative w-12 h-12 bg-gray-300 rounded-sm overflow-hidden">
           <Image src={imageSrc} alt={title} fill className="object-cover" />
         </div>
-        <span className="text-lg font-medium text-[#111827]">{title}</span>
+        <span className="text-lg font-medium text-[#fcf6ee]">{title}</span>
       </div>
 
       {/* 右側: 混雑状況 + チケット情報 */}

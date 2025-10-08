@@ -85,7 +85,7 @@ export default function TicketDistributionPage() {
 
       {/* メイン */}
       <main className="flex-1 w-full flex flex-col items-center min-h-[800px]">
-        <h1 className="text-center text-2xl font-bold mt-4 text-black">
+        <h1 className="text-center text-2xl font-bold mt-4 text-black font-title">
           整理券配布企画一覧
         </h1>
 
