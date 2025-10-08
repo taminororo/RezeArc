@@ -8,7 +8,7 @@ services:
       - "5555:5555"
     volumes:
       - .:/app
-      - node_modules_cache:/app/node_modules   # ← 匿名ではなく名前付きに
+      - node_modules_cache:/app/node_modules
     environment:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
@@ -18,16 +18,17 @@ services:
       - db
 
   db:
-    image: mysql:8.0
+    image: postgres:15
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql:/var/lib/mysql
+      - pgdata:/var/lib/postgresql/data
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=nextjs-prisma-graphql-codegen-dev
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=root
+      - POSTGRES_DB=nextjs-prisma-graphql-codegen-dev
     restart: unless-stopped
 
 volumes:
-  mysql:
+  pgdata:
   node_modules_cache: {}
