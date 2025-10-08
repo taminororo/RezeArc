@@ -17,16 +17,26 @@ export default function EventCard({
   title,
   statusComponent,
   statusTicket,
-  className = "bg-secondly border-main",
+  className = "",
   onClick,
 }: EventCardProps) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={
-        "w-full max-w-2xl flex items-center justify-between rounded-2xl p-4 bg-[#fcf6ee] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-300 border-main " +
-        className
+         className={`
+        w-full max-w-2xl 
+        bg-[#fffdfa]
+        rounded-2xl 
+        p-4 
+        ${className}
+        relative
+        border-[2px] border-[#434d6e]
+      `}
+      style={{
+        boxShadow: "0 3px 0 0 #434d6e", // 下にだけ影
+        position: "relative",
+      }}
       }
     >
       {/* 左側: 画像とイベント名 */}
